@@ -1,11 +1,14 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, use } from "react";
 import Image from "next/image";
 import SideBar from "../../../../../../../components/Sidebar";
+import { useRouter } from "next/navigation";
 
 export default function WorkerViewPage({ params }) {
+  const router = useRouter();
   const fileInputRef = useRef(null);
   const signatureInputRef = useRef(null);
+  const { slag } = use(params);
   const [workerData, setWorkerData] = useState({
     photo: null,
     name: "John Doe",
@@ -71,6 +74,27 @@ export default function WorkerViewPage({ params }) {
     } catch (error) {
       console.error("Error compressing image:", error);
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    console.log("first");
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_HOST}/api/auth/worker/delete`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "Application/json",
+          "auth-token": localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ uuid: slag }),
+      },
+    );
+    const res = await response.json();
+    console.log(res);
+    if (res.status === true) {
+      router.back();
     }
   };
 
@@ -212,16 +236,19 @@ export default function WorkerViewPage({ params }) {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
+                <button className="px-8 py-3 bg-green-600 cursor-pointer text-white rounded-lg hover:bg-green-700 transition font-semibold">
                   Edit
                 </button>
-                <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
-                  Download
-                </button>
-                <button className="px-8 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
+                <button
+                  onClick={handleDelete}
+                  className="px-8 py-3 bg-red-600 cursor-pointer text-white rounded-lg hover:bg-red-700 transition font-semibold"
+                >
                   Delete
                 </button>
-                <button className="px-8 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold">
+                <button
+                  onClick={() => router.back()}
+                  className="px-8 py-3 bg-gray-600 cursor-pointer text-white rounded-lg hover:bg-gray-700 transition font-semibold"
+                >
                   Back
                 </button>
               </div>

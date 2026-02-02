@@ -49,7 +49,7 @@ export default function About() {
           transition={{ duration: 0.5 }}
         >
           <Image
-            src="/PHOTO.jpg"
+            src="/PHOTO.JPG"
             alt="Profile"
             className="w-full h-full object-cover"
             width={300}

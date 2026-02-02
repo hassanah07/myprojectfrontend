@@ -41,6 +41,7 @@ export default function ViewWorkerPage() {
         },
       );
       const res = await response.json();
+      console.log(res);
       setData(res.data);
     };
     workers();

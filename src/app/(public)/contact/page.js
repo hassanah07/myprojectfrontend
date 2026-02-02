@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Footer from "../../../../components/Footer";
 
 export default function ContactPage() {
@@ -8,6 +10,18 @@ export default function ContactPage() {
     email: "",
     message: "",
   });
+  const [btnText, setbtnText] = useState("Send Message");
+
+  const toastOptions = {
+    theme: "colored",
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,9 +30,9 @@ export default function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setbtnText("Sending...");
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_HOST}/api/contact/send`,
+      `${process.env.NEXT_PUBLIC_HOST}/api/msg/contact`,
       {
         method: "POST",
         headers: {
@@ -28,9 +42,16 @@ export default function ContactPage() {
       },
     );
     const res = await response.json();
+
     if (res.status === true) {
+      toast.success(res.msg, toastOptions);
       setFormData({ name: "", email: "", message: "" });
-      localStorage.setItem("time", Date.now());
+      setbtnText("Message Sent☑️");
+    }
+    if (res.status === false) {
+      toast.error(res.msg, toastOptions);
+      setFormData({ name: "", email: "", message: "" });
+      setbtnText("Message Error⚠️");
     }
   };
 
@@ -44,6 +65,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-black text-white overflow-hidden py-12 px-4 sm:px-6 lg:px-8 pt-20">
+      <ToastContainer />
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -104,7 +126,7 @@ export default function ContactPage() {
                 type="submit"
                 className="w-full bg-indigo-600 text-white font-bold py-3 rounded hover:bg-indigo-700 transition transform hover:scale-105"
               >
-                Send Message
+                {btnText}
               </button>
             </form>
           </div>
